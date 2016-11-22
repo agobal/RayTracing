@@ -40,33 +40,41 @@
 
 x_laser = 0.0001;
 y_laser = 0.0001;
-z_laser = 0.0003;
+z_laser = 0.0001;
 
 intensity = 1;
 alpha = 0.4;
 
+phi = pi;
+theta = pi/4;
 while intensity > 0.01
-    phi = pi;
-    theta = pi/4;
+    phi*180/pi
+    theta*180/pi
     intersect = [];
     for i = 1:num_particles
-        a = cos(theta)*sin(phi)/cos(phi);
-        b = sin(theta)*sin(phi)/cos(phi);
         x0 = x(1, i);
         y0 = y(1, i);
         z0 = z(1, i);
         r0 = r(1, i);
-        aa = x_laser - a*z_laser - x0;
-        bb = y_laser - b*z_laser - y0;
-        A = a^2 + b^2 + 1;
-        B = (2*a*aa + 2*b*bb - 2*z0);
-        C = aa^2 + bb^2 + z0^2 - r0^2;
-        delta = B^2 - 4*A*C;
+        if abs(cos(phi)) < 0.1
+            E = 1;
+            F = -2*z0;
+            G = z0^2 + (x_laser - x0)^2 + (y_laser - y0)^2 -r0^2;
+        else
+            A = cos(theta)*sin(phi)/cos(phi);
+            B = sin(theta)*sin(phi)/cos(phi);
+            C = -A*z_laser+x_laser-x0;
+            D = -B*z_laser+y_laser-y0;
+            E = A^2 + B^2 + 1;
+            F = (2*A*C + 2*B*D - 2*z0);
+            G = C^2 + D^2 + z0^2 - r0^2;
+        end
+        delta = F^2 - 4*E*G;
         if delta <= 0
             continue;
         else
-            z1 = (-B + sqrt(delta))/(2*A);
-            z2 = (-B - sqrt(delta))/(2*A);
+            z1 = (-F + sqrt(delta))/(2*E);
+            z2 = (-F - sqrt(delta))/(2*E);
             x1 = A*z1;
             y1 = B*z1;
             x2 = A*z2;
@@ -87,7 +95,7 @@ while intensity > 0.01
     thetaphiok = 0;
     while thetaphiok == 0
         theta = rand*2*pi;
-        phi = rand*phi;
+        phi = rand*pi;
         coss = (x_laser - x(1, indx))*cos(theta)*sin(phi) + (y_laser - y(1, indx))*sin(theta)*sin(phi) + (z_laser - z(1, indx))*cos(phi);
         if coss <= 0
             thetaphiok = 1;
