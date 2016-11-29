@@ -38,70 +38,61 @@
 
 %% Shooting rays inside the packing from random locations on the top layer
 
-x_laser = 0.0001;
-y_laser = 0.0001;
-z_laser = 0.0001;
+x1 = 0.0001;
+y1 = 0.0001;
+z1 = 0.0001;
+
+x2 = 0.0001;
+y2 = 0.0001;
+z2 = 0.0000;
 
 intensity = 1;
 alpha = 0.4;
 
-phi = pi;
-theta = pi/4;
-while intensity > 0.01
-    phi*180/pi
-    theta*180/pi
-    intersect = [];
-    for i = 1:num_particles
-        x0 = x(1, i);
-        y0 = y(1, i);
-        z0 = z(1, i);
-        r0 = r(1, i);
-        if abs(cos(phi)) < 0.1
-            E = 1;
-            F = -2*z0;
-            G = z0^2 + (x_laser - x0)^2 + (y_laser - y0)^2 -r0^2;
-        else
-            A = cos(theta)*sin(phi)/cos(phi);
-            B = sin(theta)*sin(phi)/cos(phi);
-            C = -A*z_laser+x_laser-x0;
-            D = -B*z_laser+y_laser-y0;
-            E = A^2 + B^2 + 1;
-            F = (2*A*C + 2*B*D - 2*z0);
-            G = C^2 + D^2 + z0^2 - r0^2;
-        end
-        delta = F^2 - 4*E*G;
-        if delta <= 0
-            continue;
-        else
-            z1 = (-F + sqrt(delta))/(2*E);
-            z2 = (-F - sqrt(delta))/(2*E);
-            x1 = A*z1;
-            y1 = B*z1;
-            x2 = A*z2;
-            y2 = B*z2;
-            distance1 = sqrt((x1 - x_laser)^2 + (y1 - y_laser)^2 + (z1 - z_laser)^2);
-            distance2 = sqrt((x2 - x_laser)^2 + (y2 - y_laser)^2 + (z2 - z_laser)^2);
-            if distance1 < distance2
-                intersect = [intersect; x1 y1 z1 i distance1];
+for j = 1:1000000
+    j
+    intensity = 1;
+    while intensity > 0.01
+        intersect = [];
+        for i = 1:num_particles
+            x0 = x(1, i);
+            y0 = y(1, i);
+            z0 = z(1, i);
+            r0 = r(1, i);
+            % Find a, b and c for solving the equation
+            a = (x2 - x1)^2 + (y2 - y1)^2 + (z2 - z1)^2;
+            b = 2*((x2 - x1)*(x1 - x0) + (y2 - y1)*(y1 - y0) + (z2 - z1)*(z1 - z0));
+            c = x0^2 + y0^2 + z0^2 + x1^2 + y1^2 + z1^2 - 2*(x0*x1 + y0*y1 + z0*z1) - r0^2;
+            delta = b^2 - 4*a*c;
+            if delta <= 0
+                continue;
             else
-                intersect = [intersect; x2 y2 z2 i distance2];
+                t1 = (-b + sqrt(delta))/(2*a);
+                t2 = (-b - sqrt(delta))/(2*a);
+                x1p = x1 + (x2 - x1)*t1;
+                y1p = y1 + (y2 - y1)*t1;
+                z1p = z1 + (z2 - z1)*t1;
+                x2p = x1 + (x2 - x1)*t2;
+                y2p = y1 + (y2 - y1)*t2;
+                z2p = z1 + (z2 - z1)*t2;
+                distance1 = sqrt((x1p - x1)^2 + (y1p - y1)^2 + (z1p - z1)^2);
+                distance2 = sqrt((x2p - x1)^2 + (y2p - y1)^2 + (z2p - z1)^2);
+                if distance1 < distance2
+                    intersect = [intersect; x1p y1p z1p i distance1];
+                else
+                    intersect = [intersect; x2p y2p z2p i distance2];
+                end
             end
         end
-    end
-    [val indx] = min(intersect(:, 5));
-    x_laser = intersect(indx, 1);
-    y_laser = intersect(indx, 2);
-    z_laser = intersect(indx, 3);
-    thetaphiok = 0;
-    while thetaphiok == 0
+        [val indx] = min(intersect(:, 5));
+        x1 = intersect(indx, 1);
+        y1 = intersect(indx, 2);
+        z1 = intersect(indx, 3);
         theta = rand*2*pi;
         phi = rand*pi;
-        coss = (x_laser - x(1, indx))*cos(theta)*sin(phi) + (y_laser - y(1, indx))*sin(theta)*sin(phi) + (z_laser - z(1, indx))*cos(phi);
-        if coss <= 0
-            thetaphiok = 1;
-        else
-            thetaphiok = 0;
-        end
+        x2 = x0 + r0*sin(phi)*cos(theta);
+        y2 = y0 + r0*sin(phi)*sin(theta);
+        z2 = z0 + r0*cos(phi);
+        intensity = intensity*0.4;
     end
-    intensity = intensity*0.4
 end
