@@ -1,39 +1,39 @@
-% %% 2. Create the two-scale particle packing
-% 
-% % Asking the user for inputs on bounding box
-% 
-% prompt = {'Model length (mm):', 'Model width (mm):', 'Model height (mm):', 'Layer thickness (mm):'};
-% dlg_title = 'Model dimensions';
-% num_lines = 1;
-% defaultans = {'0.15', '0.15', '0.15', '0.15'};
-% answer = inputdlg(prompt, dlg_title, num_lines, defaultans);
-% 
-% % Dimensions of the packing box
-% x_container = str2double(char(answer(1)))/1000;
-% y_container = str2double(char(answer(2)))/1000;
-% z_container = str2double(char(answer(3)))/1000;
-% 
-% % Layer thickness
-% z_layer = str2double(char(answer(4)))/1000;
-% 
-% % 2.1. Creating the smaller scale (particle level) packing 
-% 
-% % Asking the user for inputs on powder particle properties
-% 
-% prompt = {'Average particle radius (mm):', 'Standard deviation:', 'Packing fraction:'};
-% dlg_title = 'Powder properties';
-% num_lines = 1;
-% defaultans = {'0.0075', '0.003', '0.64'};
-% answer = inputdlg(prompt, dlg_title, num_lines, defaultans);
-% 
-% average_particle_radius = str2double(char(answer(1)))/1000;
-% stddev = str2double(char(answer(2)))/1000;
-% packing_density = str2double(char(answer(3)));
-% 
-% 
-% 
-% disp('Creating the particle packing');
-% [x, y, z, r, num_particles] = PackingGenerator(x_container, y_container, z_container, average_particle_radius, stddev, packing_density);
+%% 2. Create the two-scale particle packing
+
+% Asking the user for inputs on bounding box
+
+prompt = {'Model length (mm):', 'Model width (mm):', 'Model height (mm):', 'Layer thickness (mm):'};
+dlg_title = 'Model dimensions';
+num_lines = 1;
+defaultans = {'0.15', '0.15', '0.15', '0.15'};
+answer = inputdlg(prompt, dlg_title, num_lines, defaultans);
+
+% Dimensions of the packing box
+x_container = str2double(char(answer(1)))/1000;
+y_container = str2double(char(answer(2)))/1000;
+z_container = str2double(char(answer(3)))/1000;
+
+% Layer thickness
+z_layer = str2double(char(answer(4)))/1000;
+
+% 2.1. Creating the smaller scale (particle level) packing 
+
+% Asking the user for inputs on powder particle properties
+
+prompt = {'Average particle radius (mm):', 'Standard deviation:', 'Packing fraction:'};
+dlg_title = 'Powder properties';
+num_lines = 1;
+defaultans = {'0.0075', '0.003', '0.64'};
+answer = inputdlg(prompt, dlg_title, num_lines, defaultans);
+
+average_particle_radius = str2double(char(answer(1)))/1000;
+stddev = str2double(char(answer(2)))/1000;
+packing_density = str2double(char(answer(3)));
+
+
+
+disp('Creating the particle packing');
+[x, y, z, r, num_particles] = PackingGenerator(x_container, y_container, z_container, average_particle_radius, stddev, packing_density);
 
 
 %% Shooting rays inside the packing from random locations on the top layer
